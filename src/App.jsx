@@ -13,6 +13,7 @@ function App() {
   
   const dispatch = useDispatch();
 
+  //check if the user is logged in at the beginning
   useEffect(() => {
     authService.getCurrentUser().then((userData) => {
       if(userData) {
@@ -31,7 +32,6 @@ function App() {
   return !loading ? (
     <>
         <SearchableDropdown />
-        <TinyMCE />
     </>
   ): <div>Loading...</div>;
 }
