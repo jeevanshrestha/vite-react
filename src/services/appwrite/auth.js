@@ -53,12 +53,7 @@ export class AuthService {
     }
     async getCurrentUser() {
         try {
-            // Check if the user is authenticated (session exists)
-            const session = await this.account.getSession('current'); // 'current' is the default session ID
-            if (!session) {
-               return null;
-            }
-    
+          
             // Now that we know the user is authenticated, we can fetch their information
             return await this.account.get();
     

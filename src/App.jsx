@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux"
 import authService from "./services/appwrite/auth"
 import {login, logout} from "./store/authSlice"
 
-
+import { Container, Header , Footer } from "./components"
 function App() {
 
   const [loading, setLoading] = useState(true) 
@@ -31,7 +31,10 @@ function App() {
  
   return !loading ? (
     <>
-        <SearchableDropdown />
+      <Container>
+        <Header />
+        <Footer />
+      </Container>
     </>
   ): <div>Loading...</div>;
 }
