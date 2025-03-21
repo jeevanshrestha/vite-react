@@ -4,10 +4,17 @@ import Container from '../container/Container'
 import {Link} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 import {useNavigate} from 'react-router-dom'
-import Logo from '../Logo'
+import Logo from '../UI/Logo'
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
+import TopNavigation from './TopNavigation'
 
 const Header = () => {
-
+  const client = new ApolloClient({
+    uri: 'https://backend.harveynormancommercial.com.au/graphql/',
+    cache: new InMemoryCache(),
+  });
+  
   const authStatus = useSelector((state)=>state.auth.status);
 
   const navigate = useNavigate()
@@ -44,6 +51,9 @@ const Header = () => {
   return (
     <header className='py-3 shadow bg-gray-500'>
     <Container>
+    {/* <ApolloProvider client={client}>
+      <TopNavigation />
+      </ApolloProvider> */}
       <nav className='flex'>
         <div className='mr-4'>
           <Link to='/'>

@@ -132,4 +132,4 @@
 
  const blogService = new BlogService();
 
- export default blog
+ export default blogService;
