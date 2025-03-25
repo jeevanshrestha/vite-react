@@ -36,7 +36,6 @@ const TinyMCE = ({name, control, label, defaultValue='', ...props}) => {
       }}
       initialValue={defaultValue}
       {...props}
-      ref={ref}
       onEditorChange={onChange}
     />
      )}
@@ -49,4 +48,4 @@ const TinyMCE = ({name, control, label, defaultValue='', ...props}) => {
 }
 
 
-export default React.forwardRef(TinyMCE)
+export default  TinyMCE ;

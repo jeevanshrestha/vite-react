@@ -1,4 +1,3 @@
- import authService from "./auth";
  import conf from "../../conf/conf";
  import { Client, ID, Databases, Storage, Query } from 'appwrite';
 
@@ -17,7 +16,7 @@
      }
 
 
-     async createBlog({ title, slug, content, featuredImage, status, userId }) {
+     async createBlog({ title, slug, content, featuredImage, status, userid }) {
          try {
              return await this.databases.createDocument(
                  conf.appwrite_database_id,
@@ -27,7 +26,7 @@
                      content,
                      featuredImage,
                      status,
-                     userId,
+                     userid,
                  })
          } catch (error) {
              console.log("Service Appwrite:: Blog:: createBlog ::error", error);
@@ -65,28 +64,30 @@
          }
      }
 
-     async getPosts(queries = [Query.status('status', true)]) {
+     async getPosts(queries = [Query.equal("status", "active")]) {
          try {
-
              return await this.databases.listDocuments(
                  conf.appwrite_database_id,
                  conf.appwrite_collection_id,
                  queries,
-             )
 
+
+             )
          } catch (error) {
-             console.log("Service Appwrite:: Blog:: getPosts ::error", error);
+             console.log("Appwrite serive :: getPosts :: error", error);
+             return false
          }
      }
 
      async getPost(slug) {
 
          try {
-             return await this.databases.getDocument(
+             const post = await this.databases.getDocument(
                  conf.appwrite_database_id,
                  conf.appwrite_collection_id,
                  slug
              )
+             return post;
 
          } catch (error) {
              console.log("Service Appwrite:: Blog:: getPost ::error", error);
@@ -121,11 +122,10 @@
      }
 
      getFilePreview(fileId) {
-
          return this.bucket.getFilePreview(
              conf.appwrite_bucket_id,
              fileId
-         );
+         )
      }
 
  }

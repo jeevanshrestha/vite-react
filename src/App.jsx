@@ -5,7 +5,8 @@ import 'react-select-search/style.css'
 import { useDispatch } from "react-redux"
 import authService from "./services/appwrite/auth"
 import {login, logout} from "./store/authSlice"
-
+import BlogForm from "./components/BlogForm/BlogForm"
+import { Outlet } from "react-router-dom"
 import { Container, Header , Footer } from "./components"
 function App() {
 
@@ -27,16 +28,17 @@ function App() {
 
   },[]);
 
-  
- 
   return !loading ? (
-    <>
-      <Container>
+    <div className='min-h-screen flex flex-wrap content-between  '>
+      <div className='w-full block'>
         <Header />
+        <main>
+          <Outlet/> 
+        </main>
         <Footer />
-      </Container>
-    </>
-  ): <div>Loading...</div>;
+      </div>
+    </div>
+  ) : null
 }
 
 export default App

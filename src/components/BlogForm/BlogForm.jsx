@@ -1,62 +1,74 @@
 import React, { useCallback, useEffect } from 'react'
 import {useForm} from 'react-hook-form'
-import {Button, Input, Select } from '../UI'
+import {Buttons, Input, Select } from '../UI'
 import TinyMCE from '../tinymce/TinyMCE'
 import   blogService  from '../../services/appwrite/blog'
 import {useNavigate} from 'react-router-dom'
-import {useSelector} from 'react-redux'
+import {   useSelector } from 'react-redux'
 
-const BlogForm = (post) => {
+const BlogForm = ({post}) => {
 
+
+  const userData = useSelector((state) => state.auth.userData);
+  console.log(userData);
+ 
   const {register ,handleSubmit, watch, setValue, control, getValues} = useForm({
     defaultValues:{
       title: post?.title || "",
       slug: post?.slug || "",
       content:post?.content || "",
-      status:post?.status|| 'active',
+      status:post?.status|| '1',
     }
   })
 
   const navigate = useNavigate()
-  const userData = useSelector(state => state.auth.UserData)
+ 
+  console.log(userData);
 
-  const submit = async  (data) => {
-    const file = data.image[0]? blogService.uploadImage(data.image[0]) : null
-    if(post) {
-      if(file){
-        blogService.deleteImage(post.featuredImage)
-      }
+  const submit = async (data) => {
+    if (post) {
+        const file = data.featuredImage[0] ? await blogService.uploadImage(data.featuredImage[0]) : null;
 
-      const dbPost = await blogService.updatePost(post.$id, {...data, featuredImage:file?file.$id:undefined})
-      if(dbPost){
-        navigate(`/post/$(dbPost.$id)`)
-      }
+        if (file) {
+          blogService.deleteFile(post.featuredImage);
+        }
 
-    }
-    else{
-        if(file){
-           data.featuredImage = file.$id
-           const dbPost = await blogService.createBlog({
+        const dbPost = await blogService.updatePost(post.$id, {
             ...data,
-            userId: userData.$id,
-           })
+            featuredImage: file ? file.$id : undefined,
+        });
 
-           if(dbPost){
-            navigate(`/post/$dbPost.$id`)
-           }
+        if (dbPost) {
+            navigate(`/post/${dbPost.$id}`);
+        }
+    } else {
+        const file = await blogService.uploadImage(data.featuredImage[0]);
 
+        if (file) {
+            const fileId = file.$id;
+            data.featuredImage = fileId;
+            const dbPost = await blogService.createBlog({ ...data, userid: userData.$id });
+
+            if (dbPost) {
+                navigate(`/post/${dbPost.$id}`);
+            }
         }
     }
-  }
+};
 
-  const slugTransform = useCallback((value)=>{
-
-    if(value && typeof value === 'string') 
-      return value.trim().toLowerCase().replace(/^[a-zA-z\d]+/g,'-')
-    else
-      return '';
-
-  },[])
+  const slugTransform = useCallback((value) => {
+    if (value && typeof value === 'string') {
+      return value
+        .trim()                   // Remove whitespace from both ends
+        .toLowerCase()            // Convert to lowercase
+        .replace(/\s+/g, '-')      // Replace spaces with -
+        .replace(/[^\w\-]+/g, '')  // Remove all non-word chars except -
+        .replace(/\-\-+/g, '-')    // Replace multiple - with single -
+        .replace(/^-+/, '')        // Trim - from start of text
+        .replace(/-+$/, '');       // Trim - from end of text
+    }
+    return '';
+  }, []);
 
   useEffect(()=>{
 
@@ -98,30 +110,34 @@ const BlogForm = (post) => {
                     type="file"
                     className="mb-4"
                     accept="image/png, image/jpg, image/jpeg, image/gif"
-                    {...register("image", { required: !post })}
+                    {...register("featuredImage", { required: !post })}
                 />
                 {post && (
                     <div className="w-full mb-4">
-                        <img
-                            src={appwriteService.getFilePreview(post.featuredImage)}
+                       { post.featuredImage && <img
+                            src={blogService.getFilePreview(post.featuredImage)}
                             alt={post.title}
                             className="rounded-lg"
-                        />
+                            
+                        />}
                     </div>
                 )}
                 <Select
-                    options={["active", "inactive"]}
+                options={[
+                  { value: "active", label: "Active" },
+                  { value: "inactive", label: "Inactive" }
+                ]}
                     label="Status"
                     className="mb-4"
                     {...register("status", { required: true })}
                 />
-                <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
+                <Buttons type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
                     {post ? "Update" : "Submit"}
-                </Button>
+                </Buttons>
             </div>
         </form>
     </div>
   )
 }
 
-export default PostForm
+export default BlogForm
